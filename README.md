@@ -1,4 +1,2 @@
 # lnmp
-<<<EOF 
-apt install git -y
-EOF
+#apt install git -y
