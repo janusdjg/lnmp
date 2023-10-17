@@ -1,2 +1,2 @@
 # lnmp
-Debian LNMP环境配置
+# apt install git -y
