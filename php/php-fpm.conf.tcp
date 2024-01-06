@@ -19,9 +19,9 @@ pm.start_servers = 8
 pm.min_spare_servers = 8
 pm.max_spare_servers = 24
 pm.max_requests = 1024
-pm.status_path = /fpm-status-zwei
+pm.status_path = /fpm-status-0
 
-ping.path = /ping-zwei
+ping.path = /ping-0
 request_terminate_timeout = 120s
 request_slowlog_timeout = 5s
 slowlog = /home/wwwroot/php_slow.log
@@ -42,9 +42,9 @@ pm.start_servers = 8
 pm.min_spare_servers = 8
 pm.max_spare_servers = 24
 pm.max_requests = 1024
-pm.status_path = /fpm-status-zwei
+pm.status_path = /fpm-status-1
 
-ping.path = /ping-zwei
+ping.path = /ping-1
 request_terminate_timeout = 120s
 request_slowlog_timeout = 5s
 slowlog = /home/wwwroot/php_slow.log
@@ -65,9 +65,9 @@ pm.start_servers = 8
 pm.min_spare_servers = 8
 pm.max_spare_servers = 24
 pm.max_requests = 1024
-pm.status_path = /fpm-status-zwei
+pm.status_path = /fpm-status-2
 
-ping.path = /ping-zwei
+ping.path = /ping-2
 request_terminate_timeout = 120s
 request_slowlog_timeout = 5s
 slowlog = /home/wwwroot/php_slow.log
@@ -88,9 +88,9 @@ pm.start_servers = 8
 pm.min_spare_servers = 8
 pm.max_spare_servers = 24
 pm.max_requests = 1024
-pm.status_path = /fpm-status-zwei
+pm.status_path = /fpm-status-3
 
-ping.path = /ping-zwei
+ping.path = /ping-3
 request_terminate_timeout = 120s
 request_slowlog_timeout = 5s
 slowlog = /home/wwwroot/php_slow.log
