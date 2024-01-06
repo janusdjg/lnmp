@@ -1,14 +1,17 @@
 [global]
-pid = /run/php/php-fpm-MPHP.pid
-error_log = /home/php-fpm-MPHP.log
+pid = /run/php/php8.3-fpm.pid
+emergency_restart_threshold = 10
+emergency_restart_interval = 1m
+process_control_timeout = 5
+error_log = /home/wwwroot/php_error.log
 log_level = notice
-
+daemonize = yes
 
 [www]
 user = www
 group = www
 
-listen = /run/php/php-fpm-MPHP.sock
+listen = /run/php/php8.3-fpm.sock
 listen.backlog = -1
 listen.allowed_clients = 127.0.0.1
 listen.owner = www
@@ -25,5 +28,5 @@ pm.process_idle_timeout = 10s
 
 request_terminate_timeout = 100
 request_slowlog_timeout = 5s
-slowlog = /home/php-slow-MPHP.log
+slowlog = /home/wwwroot/php_slow.log
 
