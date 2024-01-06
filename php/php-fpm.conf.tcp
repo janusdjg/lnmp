@@ -1,1 +1,100 @@
+[global]
+pid = /run/php/php8.3-fpm.pid
+emergency_restart_threshold = 10
+emergency_restart_interval = 1m
+process_control_timeout = 5
+error_log = /home/wwwroot/php_error.log
+log_level = notice
+daemonize = yes
 
+[www0]
+listen = 127.0.0.1:9000
+listen.allowed_clients = 127.0.0.1
+user = www
+group = www
+
+pm = dynamic
+pm.max_children = 32
+pm.start_servers = 8
+pm.min_spare_servers = 8
+pm.max_spare_servers = 24
+pm.max_requests = 1024
+pm.status_path = /fpm-status-zwei
+
+ping.path = /ping-zwei
+request_terminate_timeout = 120s
+request_slowlog_timeout = 5s
+slowlog = /home/wwwroot/php_slow.log
+rlimit_files = 4096
+rlimit_core = 0
+chdir = /home/wwwroot/
+catch_workers_output = yes
+
+[www1]
+listen = 127.0.0.1:9001
+listen.allowed_clients = 127.0.0.1
+user = www
+group = www
+
+pm = dynamic
+pm.max_children = 32
+pm.start_servers = 8
+pm.min_spare_servers = 8
+pm.max_spare_servers = 24
+pm.max_requests = 1024
+pm.status_path = /fpm-status-zwei
+
+ping.path = /ping-zwei
+request_terminate_timeout = 120s
+request_slowlog_timeout = 5s
+slowlog = /home/wwwroot/php_slow.log
+rlimit_files = 4096
+rlimit_core = 0
+chdir = /home/wwwroot/
+catch_workers_output = yes
+
+[www2]
+listen = 127.0.0.1:9002
+listen.allowed_clients = 127.0.0.1
+user = www
+group = www
+
+pm = dynamic
+pm.max_children = 32
+pm.start_servers = 8
+pm.min_spare_servers = 8
+pm.max_spare_servers = 24
+pm.max_requests = 1024
+pm.status_path = /fpm-status-zwei
+
+ping.path = /ping-zwei
+request_terminate_timeout = 120s
+request_slowlog_timeout = 5s
+slowlog = /home/wwwroot/php_slow.log
+rlimit_files = 4096
+rlimit_core = 0
+chdir = /home/wwwroot/
+catch_workers_output = yes
+
+[www3]
+listen = 127.0.0.1:9003
+listen.allowed_clients = 127.0.0.1
+user = www
+group = www
+
+pm = dynamic
+pm.max_children = 32
+pm.start_servers = 8
+pm.min_spare_servers = 8
+pm.max_spare_servers = 24
+pm.max_requests = 1024
+pm.status_path = /fpm-status-zwei
+
+ping.path = /ping-zwei
+request_terminate_timeout = 120s
+request_slowlog_timeout = 5s
+slowlog = /home/wwwroot/php_slow.log
+rlimit_files = 4096
+rlimit_core = 0
+chdir = /home/wwwroot/
+catch_workers_output = yes
