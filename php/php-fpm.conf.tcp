@@ -3,7 +3,7 @@ pid = /run/php/php8.3-fpm.pid
 emergency_restart_threshold = 10
 emergency_restart_interval = 1m
 process_control_timeout = 5
-error_log = /home/wwwroot/fpm_error.log
+error_log = /home/wwwroot/fpm.log
 log_level = notice
 daemonize = yes
 
