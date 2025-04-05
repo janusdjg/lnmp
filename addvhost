@@ -1,0 +1,100 @@
+#!/bin/bash
+
+OUTPUT_GREEN='\033[1;32m'
+OUTPUT_RED='\033[1;31m'
+OUTPUT_NC='\033[0m'
+
+# 验证用户输入的vhost_domain
+while true
+do
+    read -p "Please input your domain: " vhost_domain
+    vhost_domain=$(echo "$vhost_domain" | tr '[:upper:]' '[:lower:]')
+
+    if [[ ! $vhost_domain =~ ^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
+        echo -e "${OUTPUT_RED}Error：The entered domain name is invalid. Please enter again.${OUTPUT_NC}"
+    else
+        if [ -f "/etc/nginx/vhost/${vhost_domain}.conf" ]; then
+            echo -e "${OUTPUT_RED}Error：The entered domain name already exists. Please enter again.${OUTPUT_NC}"
+        else
+            break
+        fi
+    fi
+done
+
+ip=$(nslookup $vhost_domain | grep -oE 'Address: ([0-9]+\.){3}[0-9]+' | awk '{print $2}')
+if [ -n "$ip" ]; then
+    echo -e "${OUTPUT_GREEN}${vhost_domain}: ${ip}${OUTPUT_NC}"
+else
+    echo -e "${OUTPUT_RED}Error：Unable to resolve domain name to an IP address${OUTPUT_NC}"
+fi
+
+# 根据用户选择设置vhost_sub_domain的值
+read -p "Do your want to add the 'www.' for this domain? Default y (y/n): " add_www_prefix
+if [[ -z $add_www_prefix ]]; then
+    add_www_prefix="y"
+fi
+if [[ $add_www_prefix == "y" ]]; then
+    vhost_sub_domain="www.${vhost_domain}"
+    ip=$(nslookup $vhost_sub_domain | grep -oE 'Address: ([0-9]+\.){3}[0-9]+' | awk '{print $2}')
+    if [ -n "$ip" ]; then
+        echo -e "${OUTPUT_GREEN}${vhost_sub_domain}: ${ip}${OUTPUT_NC}"
+    else
+        echo -e "${OUTPUT_RED}Error：Unable to resolve domain name to an IP address${OUTPUT_NC}"
+    fi
+else
+    vhost_sub_domain=''
+fi
+
+read -p "Do your want to enable wordpress rewrite conf? Default n (y/n): " enable_wordpress
+if [[ -z $enable_wordpress ]]; then
+    enable_wordpress="none.conf"
+fi
+if [[ $enable_wordpress == "y" ]]; then
+    enable_wordpress="wordpress.conf"
+else
+    enable_wordpress='none.conf'
+fi
+
+# 建立NGINX HTTP VHOST文件 用于生成SSL证书验证
+sed -e "s/VHOST_DOMAIN/${vhost_domain}/g" -e "s/VHOST_SUB_DOMAIN/${vhost_sub_domain}/g" /root/lnmp/vhost.conf > /etc/nginx/vhost/${vhost_domain}.conf
+
+# 测试NGINX配置文件并reload
+if nginx -t 2>&1 | grep -q "test is successful"; then
+    echo -e "${OUTPUT_GREEN}Nginx configuration test succeeded${OUTPUT_NC}"
+    # 验证域名是否可以正常访问
+    mkdir -p /home/wwwroot/${vhost_domain}/
+    echo "open_basedir=/home/wwwroot/${vhost_domain}:/tmp/:/proc/" > /home/wwwroot/${vhost_domain}/.user.ini
+    chattr +i /home/wwwroot/${vhost_domain}/.user.ini
+    echo 'hello' > /home/wwwroot/${vhost_domain}/hello.txt
+    nginx -s reload
+    sleep 2
+    if curl http://${vhost_domain}/hello.txt 2>&1 | grep -q "hello"; then
+        echo -e "${OUTPUT_GREEN}Test http://${vhost_domain}/hello.txt succeeded${OUTPUT_NC}"
+        rm -f /home/wwwroot/${vhost_domain}/hello.txt
+
+        # 颁发并安装证书
+        mkdir -p /etc/nginx/ssl/${vhost_domain}
+        if [ -n "$vhost_sub_domain" ]; then
+            /root/.acme.sh/acme.sh --issue -d ${vhost_domain} -d ${vhost_sub_domain} -w /home/wwwroot/$vhost_domain
+            /root/.acme.sh/acme.sh --install-cert -d ${vhost_domain} -d ${vhost_sub_domain} --key-file /etc/nginx/ssl/${vhost_domain}/key.pem --fullchain-file /etc/nginx/ssl/${vhost_domain}/fullchain.pem
+        else
+            /root/.acme.sh/acme.sh --issue -d ${vhost_domain} -w /home/wwwroot/${vhost_domain}
+            /root/.acme.sh/acme.sh --install-cert -d ${vhost_domain} --key-file /etc/nginx/ssl/${vhost_domain}/key.pem --fullchain-file /etc/nginx/ssl/${vhost_domain}/fullchain.pem
+        fi
+
+        # 加入VHOST SSL配置项
+        sed -e "s/VHOST_DOMAIN/${vhost_domain}/g" -e "s/VHOST_SUB_DOMAIN/${vhost_sub_domain}/g" /root/lnmp/vhost_ssl.conf >> /etc/nginx/vhost/${vhost_domain}.conf
+        sed -i "s/none.conf/${enable_wordpress}/g" /etc/nginx/vhost/${vhost_domain}.conf
+        service nginx force-reload
+    else
+        echo -e "${OUTPUT_RED}Test http://${vhost_domain}/hello.txt failed${OUTPUT_NC}"
+        chattr -i /home/wwwroot/${vhost_domain}/.user.ini
+        rm -rf /home/wwwroot/${vhost_domain}/
+        rm -f /etc/nginx/vhost/${vhost_domain}.conf
+    fi
+else
+    echo -e "${OUTPUT_RED}Nginx configuration test failed.${OUTPUT_NC}"
+    rm -f /etc/nginx/vhost/${vhost_domain}.conf
+fi
+
+echo 'All done.'
