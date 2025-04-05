@@ -5,19 +5,25 @@ OUTPUT_RED='\033[1;31m'
 OUTPUT_NC='\033[0m'
 
 # 验证用户输入的vhost_domain
-while true
-do
+while true; do
     read -p "Please input your domain: " vhost_domain
+
+    # 转换为小写
     vhost_domain=$(echo "$vhost_domain" | tr '[:upper:]' '[:lower:]')
 
-    if [[ ! $vhost_domain =~ ^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
-        echo -e "${OUTPUT_RED}Error：The entered domain name is invalid. Please enter again.${OUTPUT_NC}"
+    # 如果输入为空或用户想退出
+    if [[ -z "$vhost_domain" || "$vhost_domain" =~ ^(exit|quit|q)$ ]]; then
+        echo -e "${OUTPUT_YELLOW}Operation cancelled by user.${OUTPUT_NC}"
+        exit 1
+    fi
+
+    # 校验域名格式
+    if [[ ! "$vhost_domain" =~ ^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
+        echo -e "${OUTPUT_RED}Error: The entered domain name is invalid. Please try again.${OUTPUT_NC}"
+    elif [[ -f "/etc/nginx/vhost/${vhost_domain}.conf" ]]; then
+        echo -e "${OUTPUT_RED}Error: The domain already exists. Please try another.${OUTPUT_NC}"
     else
-        if [ -f "/etc/nginx/vhost/${vhost_domain}.conf" ]; then
-            echo -e "${OUTPUT_RED}Error：The entered domain name already exists. Please enter again.${OUTPUT_NC}"
-        else
-            break
-        fi
+        break
     fi
 done
 
@@ -87,10 +93,16 @@ if nginx -t 2>&1 | grep -q "test is successful"; then
         sed -i "s/none.conf/${enable_wordpress}/g" /etc/nginx/vhost/${vhost_domain}.conf
         service nginx force-reload
     else
-        echo -e "${OUTPUT_RED}Test http://${vhost_domain}/hello.txt failed${OUTPUT_NC}"
-        chattr -i /home/wwwroot/${vhost_domain}/.user.ini
-        rm -rf /home/wwwroot/${vhost_domain}/
-        rm -f /etc/nginx/vhost/${vhost_domain}.conf
+        read -p "Do you want to undo these operations? Default y (y/n): " undo
+        if [[ -z $undo ]]; then
+            undo="y"
+        fi
+        if [[ $undo == "y" ]]; then
+            echo -e "${OUTPUT_RED}Test http://${vhost_domain}/hello.txt failed${OUTPUT_NC}"
+            chattr -i /home/wwwroot/${vhost_domain}/.user.ini
+            rm -rf /home/wwwroot/${vhost_domain}/
+            rm -f /etc/nginx/vhost/${vhost_domain}.conf
+        fi
     fi
 else
     echo -e "${OUTPUT_RED}Nginx configuration test failed.${OUTPUT_NC}"
