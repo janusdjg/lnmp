@@ -11,8 +11,8 @@ UNDO() {
     fi
     if [[ $undo == "y" ]]; then
         local domain="$1"
-        chattr -i /home/wwwroot/${domain}/.user.ini 2>/dev/null
-        rm -rf /home/wwwroot/"$domain"/
+        #chattr -i /home/wwwroot/${domain}/.user.ini 2>/dev/null
+        #rm -rf /home/wwwroot/"$domain"/
         rm -f /etc/nginx/vhost/"$domain".conf
         /root/.acme.sh/acme.sh --remove --domain "$domain"
         rm -rf /root/.acme.sh/"$domain"_ecc
