@@ -107,9 +107,9 @@ if nginx -t 2>&1 | grep -q "test is successful"; then
         sed -e "s/VHOST_DOMAIN/${vhost_domain}/g" -e "s/VHOST_SUB_DOMAIN/${vhost_sub_domain}/g" /root/lnmp/vhost_ssl_1024.conf >> /etc/nginx/vhost/${vhost_domain}.conf
         sed -i "s/none.conf/${enable_wordpress}/g" /etc/nginx/vhost/${vhost_domain}.conf
         if nginx -t 2>&1 | grep -q "test is successful"; then
-            echo -e "${OUTPUT_GREEN} Nginx configuration filev test is successful"
+            echo -e "${OUTPUT_GREEN}Nginx configuration filev test is successful${OUTPUT_NC}"
         else
-            echo -e "${OUTPUT_RED} Nginx configuration filev test is fail"
+            echo -e "${OUTPUT_RED}Nginx configuration filev test is fail${OUTPUT_NC}"
             UNDO "$vhost_domain"
         fi
     else
