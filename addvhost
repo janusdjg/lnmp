@@ -113,6 +113,7 @@ if nginx -t 2>&1 | grep -q "test is successful"; then
             UNDO "$vhost_domain"
         fi
     else
+        echo -e "${OUTPUT_RED}Get http://${vhost_domain}/hello.txt fail${OUTPUT_NC}"
         UNDO "$vhost_domain"
     fi
 else
