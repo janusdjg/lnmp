@@ -16,7 +16,6 @@ UNDO() {
         rm -f /etc/nginx/vhost/"$domain".conf
         acme.sh --remove --domain "$domain"
         rm -rf /root/.acme.sh/"$domain"_ecc
-        systemctl reload nginx
     fi
 }
 
@@ -107,14 +106,12 @@ if nginx -t 2>&1 | grep -q "test is successful"; then
         # 加入VHOST SSL配置项
         sed -e "s/VHOST_DOMAIN/${vhost_domain}/g" -e "s/VHOST_SUB_DOMAIN/${vhost_sub_domain}/g" /root/lnmp/vhost_ssl_1024.conf >> /etc/nginx/vhost/${vhost_domain}.conf
         sed -i "s/none.conf/${enable_wordpress}/g" /etc/nginx/vhost/${vhost_domain}.conf
-        if nginx -t 2>&1; then
+        if nginx -t 2>&1 | grep -q "test is successful"; then
             echo -e "${OUTPUT_GREEN} Nginx configuration filev test is successful"
         else
             echo -e "${OUTPUT_RED} Nginx configuration filev test is fail"
             UNDO "$vhost_domain"
-            exit 1
         fi
-        systemctl reload nginx
     else
         UNDO "$vhost_domain"
     fi
@@ -122,5 +119,5 @@ else
     echo -e "${OUTPUT_RED}Nginx configuration test failed.${OUTPUT_NC}"
     rm -f /etc/nginx/vhost/${vhost_domain}.conf
 fi
-
+systemctl reload nginx
 echo 'All done.'
