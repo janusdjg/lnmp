@@ -91,7 +91,7 @@ if nginx -t 2>&1 | grep -q "test is successful"; then
         # 加入VHOST SSL配置项
         sed -e "s/VHOST_DOMAIN/${vhost_domain}/g" -e "s/VHOST_SUB_DOMAIN/${vhost_sub_domain}/g" /root/lnmp/vhost_ssl_1024.conf >> /etc/nginx/vhost/${vhost_domain}.conf
         sed -i "s/none.conf/${enable_wordpress}/g" /etc/nginx/vhost/${vhost_domain}.conf
-        service nginx force-reload
+        systemctl reload nginx
     else
         read -p "Do you want to undo these operations? Default y (y/n): " undo
         if [[ -z $undo ]]; then
