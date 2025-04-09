@@ -82,10 +82,10 @@ if nginx -t 2>&1 | grep -q "test is successful"; then
         mkdir -p /etc/nginx/ssl/${vhost_domain}
         if [ -n "$vhost_sub_domain" ]; then
             /root/.acme.sh/acme.sh --issue -d ${vhost_domain} -d ${vhost_sub_domain} -w /home/wwwroot/$vhost_domain
-            /root/.acme.sh/acme.sh --install-cert -d ${vhost_domain} -d ${vhost_sub_domain} --key-file /etc/nginx/ssl/${vhost_domain}/key.key --fullchain-file /etc/nginx/ssl/${vhost_domain}/fullchain.cer --ca-file /etc/nginx/ssl/${vhost_domain}/chain.pem --reloadcmd "service nginx reload"
+            /root/.acme.sh/acme.sh --install-cert -d ${vhost_domain} -d ${vhost_sub_domain} --key-file /etc/nginx/ssl/${vhost_domain}/key.key --fullchain-file /etc/nginx/ssl/${vhost_domain}/fullchain.cer --ca-file /etc/nginx/ssl/${vhost_domain}/chain.pem --reloadcmd "systemctl reload nginx"
         else
             /root/.acme.sh/acme.sh --issue -d ${vhost_domain} -w /home/wwwroot/${vhost_domain}
-            /root/.acme.sh/acme.sh --install-cert -d ${vhost_domain} --key-file /etc/nginx/ssl/${vhost_domain}/key.key --fullchain-file /etc/nginx/ssl/${vhost_domain}/fullchain.cer --ca-file /etc/nginx/ssl/${vhost_domain}/chain.pem  --reloadcmd "service nginx reload"
+            /root/.acme.sh/acme.sh --install-cert -d ${vhost_domain} --key-file /etc/nginx/ssl/${vhost_domain}/key.key --fullchain-file /etc/nginx/ssl/${vhost_domain}/fullchain.cer --ca-file /etc/nginx/ssl/${vhost_domain}/chain.pem  --reloadcmd "systemctl reload nginx"
         fi
 
         # 加入VHOST SSL配置项
