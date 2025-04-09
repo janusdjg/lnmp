@@ -14,7 +14,7 @@ UNDO() {
         chattr -i /home/wwwroot/${domain}/.user.ini 2>/dev/null
         rm -rf /home/wwwroot/"$domain"/
         rm -f /etc/nginx/vhost/"$domain".conf
-        acme.sh --remove --domain "$domain"
+        /root/.acme.sh/acme.sh --remove --domain "$domain"
         rm -rf /root/.acme.sh/"$domain"_ecc
     fi
 }
