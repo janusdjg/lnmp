@@ -109,7 +109,7 @@ if nginx -t 2>&1 | grep -q "test is successful"; then
         if nginx -t 2>&1 | grep -q "test is successful"; then
             echo -e "${OUTPUT_GREEN}Nginx configuration filev test is successful${OUTPUT_NC}"
         else
-            echo -e "${OUTPUT_RED}Nginx configuration filev test is fail${OUTPUT_NC}"
+            echo -e "${OUTPUT_RED}Nginx configuration file test is fail${OUTPUT_NC}"
             UNDO "$vhost_domain"
         fi
     else
